@@ -1,0 +1,179 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Visual Flow Editor</title>
+    <link rel="stylesheet" href="css/styles.css">
+</head>
+<body>
+    <!-- Header -->
+    <header class="editor-header">
+        <div class="header-logo">
+            <h1>Flow Editor</h1>
+        </div>
+        <div class="header-toolbar">
+            <button id="deploy-btn" class="btn btn-deploy">Deploy</button>
+            <button id="save-btn" class="btn btn-secondary">Save</button>
+            <button id="clear-btn" class="btn btn-secondary">Clear</button>
+        </div>
+    </header>
+
+    <!-- Main Container -->
+    <div class="editor-container">
+        <!-- Node Palette -->
+        <div class="node-palette">
+            <div class="palette-header">
+                <h3>Node Palette</h3>
+                <input type="text" id="node-search" placeholder="Search nodes...">
+            </div>
+            <div class="palette-content">
+                <!-- Input Nodes -->
+                <div class="palette-category">
+                    <h4>Input</h4>
+                    <div class="palette-nodes">
+                        <div class="palette-node" data-node-type="input">
+                            <i class="node-icon">📥</i>
+                            <span>Input</span>
+                        </div>
+                        <div class="palette-node" data-node-type="trigger">
+                            <i class="node-icon">⏰</i>
+                            <span>Trigger</span>
+                        </div>
+                        <div class="palette-node" data-node-type="exampleData">
+                            <i class="node-icon">📦</i>
+                            <span>Example Data</span>
+                        </div>
+                        <div class="palette-node" data-node-type="idvDataSim">
+                            <i class="node-icon">🔐</i>
+                            <span>IDV Data Simulation</span>
+                        </div>
+                        <div class="palette-node" data-node-type="networkDataSim">
+                            <i class="node-icon">🔗</i>
+                            <span>Network Data Simulation</span>
+                        </div>
+                    </div>
+                </div>
+
+                <!-- Function Nodes -->
+                <div class="palette-category">
+                    <h4>Function</h4>
+                    <div class="palette-nodes">
+                        <div class="palette-node" data-node-type="function">
+                            <i class="node-icon">⚙️</i>
+                            <span>Function</span>
+                        </div>
+                        <div class="palette-node" data-node-type="filter">
+                            <i class="node-icon">🔍</i>
+                            <span>Filter</span>
+                        </div>
+                        <div class="palette-node" data-node-type="transform">
+                            <i class="node-icon">🔄</i>
+                            <span>Transform</span>
+                        </div>
+                        <div class="palette-node" data-node-type="idvToGraph">
+                            <i class="node-icon">🔀</i>
+                            <span>IDV to Graph</span>
+                        </div>
+                    </div>
+                </div>
+
+                <!-- Output Nodes -->
+                <div class="palette-category">
+                    <h4>Output</h4>
+                    <div class="palette-nodes">
+                        <div class="palette-node" data-node-type="output">
+                            <i class="node-icon">📤</i>
+                            <span>Output</span>
+                        </div>
+                        <div class="palette-node" data-node-type="debug">
+                            <i class="node-icon">🐛</i>
+                            <span>Debug</span>
+                        </div>
+                        <div class="palette-node" data-node-type="dataTable">
+                            <i class="node-icon">📊</i>
+                            <span>Data Table</span>
+                        </div>
+                        <div class="palette-node" data-node-type="chartNode">
+                            <i class="node-icon">📈</i>
+                            <span>Chart</span>
+                        </div>
+                        <div class="palette-node" data-node-type="graphViz">
+                            <i class="node-icon">🕸️</i>
+                            <span>Graph Visualization</span>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+
+        <!-- Main Workspace -->
+        <div class="main-workspace">
+            <div class="workspace-header">
+                <div class="workspace-tabs">
+                    <div class="tab active" data-tab="flow1">
+                        <span>Flow 1</span>
+                        <button class="tab-close">×</button>
+                    </div>
+                    <button class="tab-add">+</button>
+                </div>
+                <div class="workspace-controls">
+                    <button id="zoom-in" class="control-btn">🔍+</button>
+                    <button id="zoom-out" class="control-btn">🔍-</button>
+                    <button id="zoom-fit" class="control-btn">⬛</button>
+                </div>
+            </div>
+            <div class="canvas-container">
+                <svg id="workspace-canvas" class="workspace-canvas">
+                    <defs>
+                        <pattern id="grid" width="20" height="20" patternUnits="userSpaceOnUse">
+                            <path d="M 20 0 L 0 0 0 20" fill="none" stroke="#e0e0e0" stroke-width="1"/>
+                        </pattern>
+                        <marker id="arrowhead" markerWidth="10" markerHeight="7" 
+                         refX="9" refY="3.5" orient="auto">
+                            <polygon points="0 0, 10 3.5, 0 7" fill="#666" />
+                        </marker>
+                    </defs>
+                    <rect id="background" width="100%" height="100%" fill="url(#grid)"/>
+                    <g id="links-layer"></g>
+                    <g id="nodes-layer"></g>
+                    <g id="temp-layer"></g>
+                </svg>
+            </div>
+        </div>
+
+        <!-- Properties Panel -->
+        <div class="properties-panel">
+            <div class="panel-header">
+                <h3>Properties</h3>
+            </div>
+            <div class="panel-content" id="properties-content">
+                <div class="no-selection">
+                    <p>Select a node to view its properties</p>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <!-- Node Configuration Modal -->
+    <div id="node-config-modal" class="modal">
+        <div class="modal-content">
+            <div class="modal-header">
+                <h3 id="modal-title">Node Configuration</h3>
+                <button class="modal-close">&times;</button>
+            </div>
+            <div class="modal-body" id="modal-body">
+                <!-- Dynamic content -->
+            </div>
+            <div class="modal-footer">
+                <button id="modal-cancel" class="btn btn-secondary">Cancel</button>
+                <button id="modal-save" class="btn btn-primary">Save</button>
+            </div>
+        </div>
+    </div>
+
+    <script src="js/flowEditor.js"></script>
+    <script src="js/nodeTypes.js"></script>
+    <script src="js/app.js"></script>
+</body>
+</html>
